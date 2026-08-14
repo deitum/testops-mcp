@@ -1,0 +1,59 @@
+name: Bug report
+description: A tool answers wrongly, or the server will not talk to your TestOps instance
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect instead, and why is the actual result wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: >-
+        The environment variables you set, **with the secrets removed** — the names and shapes are
+        what matter (`TESTOPS_BASE_URL=https://testops.example.com`, `TESTOPS_PROJECT_ID=23`, …).
+        The server's startup banner on stderr is a good summary and contains no secrets.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: What was called, and what came back
+      description: >-
+        The tool name and arguments, plus the error or result (secrets removed). For a Markdown
+        import, the returned report matters more than the file.
+      render: json
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version of @deitum/testops-mcp
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: testops
+    attributes:
+      label: Allure TestOps version
+      description: The version shown in the TestOps UI, and anything unusual about the deployment.
+      placeholder: 5.4.0, behind a reverse proxy with an internal CA
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Node.js version and MCP client
+      placeholder: Node.js 22.11.0, Claude Desktop
+    validations:
+      required: true

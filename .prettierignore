@@ -1,0 +1,10 @@
+dist
+coverage
+node_modules
+CHANGELOG.md
+package-lock.json
+
+# Returned verbatim to LLM clients by testcase_markdown_guide: these two files are
+# the Markdown import contract, not prose, so the formatter must not touch them.
+docs
+examples

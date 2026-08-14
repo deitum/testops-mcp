@@ -1,0 +1,33 @@
+name: Feature request
+description: A tool, a TestOps endpoint or a Markdown construct this does not cover yet
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to find out or do?
+      description: >-
+        The question you want to put to the model, or the operation you want it to perform —
+        rather than the API call you think it needs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: endpoint
+    attributes:
+      label: Which TestOps endpoint would answer it?
+      description: >-
+        A path from your instance's `/swagger-ui`, if you know it. Say which project-scoping
+        parameter it takes: every tool here works only in the configured project.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: writes
+    attributes:
+      label: Does it change project data?
+      options:
+        - 'No — read only'
+        - 'Yes — it creates, updates or deletes something'
+    validations:
+      required: true

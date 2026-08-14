@@ -1,0 +1,97 @@
+{
+  "name": "@deitum/testops-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Allure TestOps — test cases, Markdown import, launches and project statistics over the TestOps REST API, locked to a single project.",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "testops-mcp": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "examples",
+    "CHANGELOG.md"
+  ],
+  "author": "Zvyagin Danila",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "allure",
+    "allure-testops",
+    "testops",
+    "test-management",
+    "qa",
+    "llm",
+    "ai"
+  ],
+  "homepage": "https://github.com/deitum/testops-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/deitum/testops-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deitum/testops-mcp.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@10.9.8",
+  "scripts": {
+    "clean": "rimraf dist coverage",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "check:package": "publint --strict && attw --pack . --entrypoints .",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build && npm run check:package",
+    "inspector": "npm run build && npx @modelcontextprotocol/inspector node dist/cli.js",
+    "prepack": "npm run build",
+    "changeset": "changeset",
+    "changeset:version": "changeset version && node scripts/sync-version.mjs && npm install --package-lock-only",
+    "release": "changeset publish"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "axios": "^1.14.1",
+    "form-data": "^4.0.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@changesets/cli": "^2.31.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.19.43",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/eslint-plugin": "^1.6.27",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import-x": "^4.17.1",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
+    "publint": "^0.3.23",
+    "rimraf": "^6.1.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10"
+  }
+}
