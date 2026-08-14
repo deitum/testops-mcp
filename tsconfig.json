@@ -3,7 +3,7 @@
     "target": "ES2022",
     "lib": ["ES2022"],
     // NodeNext without `"type": "module"` in package.json, so the emitted files
-    // are CommonJS and `npx camunda-mcp` can run `dist/cli.js` directly — the
+    // are CommonJS and `npx testops-mcp` can run `dist/cli.js` directly — the
     // MCP SDK ships a CJS build behind its exports map.
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
