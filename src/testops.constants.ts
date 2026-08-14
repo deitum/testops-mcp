@@ -2,7 +2,7 @@
  * Kept in step with `package.json` by `scripts/sync-version.mjs`, which
  * `npm run changeset:version` runs after the release bump.
  */
-export const SERVER_VERSION = '0.1.0';
+export const SERVER_VERSION = '0.2.0';
 
 /** Identity reported to the MCP client during initialisation. */
 export const SERVER_INFO = {
