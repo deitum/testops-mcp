@@ -1,6 +1,6 @@
 {
   "name": "@deitum/testops-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for Allure TestOps — test cases, Markdown import, launches and project statistics over the TestOps REST API, locked to a single project.",
   "type": "commonjs",
   "main": "./dist/index.js",
