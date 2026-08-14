@@ -14,7 +14,7 @@ import { once } from 'node:events';
 import { createInterface } from 'node:readline';
 
 const GUIDE_FILES = ['docs/markdown-import.md', 'examples/testops-markdown-import-example.md'];
-const EXPECTED_TOOL_COUNT = 21;
+const EXPECTED_TOOL_COUNT = 22;
 
 const server = spawn(process.execPath, ['dist/cli.js'], {
   env: {
@@ -73,7 +73,7 @@ await once(server, 'exit');
 console.log(`${initialized.result.serverInfo.name} ${initialized.result.serverInfo.version}`);
 console.log(`${names.length} tools: ${names.slice(0, 3).join(', ')}, …`);
 
-// 15 test-case tools, 5 launch tools and the project statistics one.
+// 15 test-case tools, 6 launch tools and the project statistics one.
 if (names.length !== EXPECTED_TOOL_COUNT) {
   console.error(`Expected ${EXPECTED_TOOL_COUNT} tools, got ${names.length}.`);
   process.exit(1);
