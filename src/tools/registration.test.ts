@@ -186,6 +186,7 @@ test('publishes the complete MCP contract locked to the configured project', asy
     'launch_get',
     'launch_list',
     'launch_statistic',
+    'launch_test_results',
     'launch_update',
     'statistics_overall',
     'testcase_add_issue_links',
@@ -239,6 +240,7 @@ test('publishes the complete MCP contract locked to the configured project', asy
     'testcase_search',
     'testcase_history',
     'launch_list',
+    'launch_test_results',
     'testcase_search_by_custom_field',
   ]) {
     const schema = tools.get(toolName)?.inputSchema as ToolJsonSchema | undefined;
@@ -340,6 +342,24 @@ test('publishes the complete MCP contract locked to the configured project', asy
   ]);
   assert.deepEqual(launchUpdateSchema?.required, ['id', 'expectedName', 'name']);
   assert.equal(launchUpdateSchema?.properties && 'status' in launchUpdateSchema.properties, false);
+
+  const launchTestResultsTool = tools.get('launch_test_results');
+  const launchTestResultsSchema = launchTestResultsTool?.inputSchema as ToolJsonSchema | undefined;
+  assert.deepEqual(Object.keys(launchTestResultsSchema?.properties || {}).sort(), [
+    'deleted',
+    'id',
+    'page',
+    'size',
+  ]);
+  assert.deepEqual(launchTestResultsSchema?.required, ['id']);
+  assert.equal(launchTestResultsSchema?.properties?.page.default, 0);
+  assert.equal(launchTestResultsSchema?.properties?.size.default, 20);
+  assert.equal(launchTestResultsSchema?.properties?.deleted.default, false);
+  assert.match(
+    launchTestResultsSchema?.properties?.deleted.description || '',
+    /deleted results instead of active ones/i,
+  );
+  assert.equal(launchTestResultsTool?.annotations?.readOnlyHint, true);
 
   const guideTool = tools.get('testcase_markdown_guide');
   assert.equal(guideTool?.annotations?.readOnlyHint, true);

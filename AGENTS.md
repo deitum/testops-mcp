@@ -84,7 +84,10 @@ fails before writing and import preflight rejects any file with issue keys, so n
 Launch tools use the documented `/api/launch` endpoints. Creation accepts only `name` plus the
 server-owned project and must not be retried automatically after an unknown outcome. Update is
 rename-only and requires the exact name returned by `launch_get`. Launch status changes are separate
-lifecycle operations and are not exposed. Project statistics come from `/api/project/{id}/stats`.
+lifecycle operations and are not exposed. A launch's test results come from the V2 folder tree
+endpoint and are read only after the launch itself has been verified against the configured project;
+`deleted` is a caller-chosen filter that defaults to active results. Project statistics come from
+`/api/project/{id}/stats`.
 
 ## Project Layout
 

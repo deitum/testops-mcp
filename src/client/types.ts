@@ -172,8 +172,30 @@ export interface LaunchCreateRequest {
   name: string;
 }
 
+export interface LaunchTestResultSearchParams {
+  page?: number;
+  size?: number;
+  /** `true` returns deleted results instead of active ones; defaults to `false`. */
+  deleted?: boolean;
+}
+
+export interface LaunchTestResult {
+  /** `LEAF` is one test result; any other node groups results into a tree folder. */
+  type: string;
+  id: number;
+  name: string;
+  status?: TestStatus;
+  testCaseId?: number;
+  duration?: number;
+  flaky?: boolean;
+  hidden?: boolean;
+  manual?: boolean;
+}
+
+export type TestStatus = 'failed' | 'broken' | 'passed' | 'skipped' | 'unknown' | 'in_progress';
+
 export interface TestStatusCount {
-  status: 'failed' | 'broken' | 'passed' | 'skipped' | 'unknown' | 'in_progress';
+  status: TestStatus;
   count: number;
 }
 

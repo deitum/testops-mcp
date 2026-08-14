@@ -135,4 +135,33 @@ export function registerLaunchTools(server: McpServer, client: TestOpsClient): v
       }
     },
   );
+
+  server.registerTool(
+    'launch_test_results',
+    {
+      title: 'Get Launch Test Results',
+      description:
+        'Get one page of the test results in a launch, with their statuses and test cases. An item of type "LEAF" is one test result; any other type is a folder that groups them and carries no status.',
+      inputSchema: {
+        id: positiveId,
+        page: pageNumber,
+        size: pageSize,
+        deleted: z
+          .boolean()
+          .default(false)
+          .describe('Return deleted results instead of active ones.'),
+      },
+      annotations: {
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+    },
+    async ({ id, page, size, deleted }) => {
+      try {
+        return jsonResult(await client.getLaunchTestResults(id, { page, size, deleted }));
+      } catch (error: unknown) {
+        return errorResult(error);
+      }
+    },
+  );
 }

@@ -1737,6 +1737,114 @@ test('launch update checks the exact name, PATCHes only name, and statistics are
   assert.deepEqual(patchBodies, [{ name: 'After update' }, { name: 'After update' }]);
 });
 
+test('launch test results are read per launch, exclude deleted ones, and are normalized', async (context) => {
+  const treeRequests: string[] = [];
+  const fixture = await startServer((request, response, url) => {
+    if (url.pathname === '/api/uaa/oauth/token') {
+      writeJson(response, 200, { access_token: 'token' });
+      return;
+    }
+
+    const launchMatch = url.pathname.match(/^\/api\/launch\/(20|21|22)$/);
+    if (request.method === 'GET' && launchMatch) {
+      const id = Number(launchMatch[1]);
+      writeJson(response, 200, { id, name: `Launch ${id}`, projectId: id === 21 ? 23 : 17 });
+      return;
+    }
+
+    assert.equal(request.method, 'GET');
+    assert.match(url.pathname, /^\/api\/v2\/launch\/(20|22)\/test-result\/tree\/folder$/);
+    treeRequests.push(`${url.pathname}${url.search}`);
+    if (url.pathname.includes('/22/')) {
+      writeJson(response, 200, {
+        content: [{ type: 'LEAF', id: 5, name: 'Result in an unknown state', status: 'pending' }],
+        number: 0,
+        size: 20,
+        totalElements: 1,
+        totalPages: 1,
+      });
+      return;
+    }
+    if (url.searchParams.get('deleted') === 'true') {
+      writeJson(response, 200, {
+        content: [{ type: 'LEAF', id: 7, name: 'Deleted result', status: 'broken' }],
+        number: 0,
+        size: 20,
+        totalElements: 1,
+        totalPages: 1,
+      });
+      return;
+    }
+    writeJson(response, 200, {
+      content: [
+        {
+          type: 'LEAF',
+          id: 118304490,
+          name: 'Passing test',
+          testCaseId: 157795,
+          status: 'passed',
+          start: 1786690603360,
+          stop: 1786690603750,
+          duration: 390,
+          flaky: false,
+          hidden: false,
+          manual: false,
+          createdDate: 1786690608215,
+          lastModifiedDate: 1786690608495,
+        },
+        { type: 'FOLDER', id: 900, name: 'Grouping folder', leafsCount: 3 },
+      ],
+      number: 1,
+      size: 2,
+      totalElements: 3,
+      totalPages: 2,
+    });
+  });
+  context.onTestFinished(fixture.close);
+
+  const client = new TestOpsClient(fixture.baseUrl, 'api-key', 17);
+  assert.deepEqual(await client.getLaunchTestResults(20, { page: 1, size: 2 }), {
+    items: [
+      {
+        type: 'LEAF',
+        id: 118304490,
+        name: 'Passing test',
+        status: 'passed',
+        testCaseId: 157795,
+        duration: 390,
+        flaky: false,
+        hidden: false,
+        manual: false,
+      },
+      { type: 'FOLDER', id: 900, name: 'Grouping folder' },
+    ],
+    page: 1,
+    size: 2,
+    totalElements: 3,
+    totalPages: 2,
+  });
+  assert.deepEqual(await client.getLaunchTestResults(20, { page: 0, size: 20, deleted: true }), {
+    items: [{ type: 'LEAF', id: 7, name: 'Deleted result', status: 'broken' }],
+    page: 0,
+    size: 20,
+    totalElements: 1,
+    totalPages: 1,
+  });
+  await assert.rejects(
+    client.getLaunchTestResults(21, { page: 0, size: 20 }),
+    /Launch 21 belongs to project 23, but this server is configured for project 17/,
+  );
+  await assert.rejects(
+    client.getLaunchTestResults(22, { page: 0, size: 20 }),
+    /Invalid launch test result 0 status/,
+  );
+  assert.deepEqual(treeRequests, [
+    '/api/v2/launch/20/test-result/tree/folder?page=1&size=2&deleted=false',
+    '/api/v2/launch/20/test-result/tree/folder?page=0&size=20&deleted=true',
+    '/api/v2/launch/22/test-result/tree/folder?page=0&size=20&deleted=false',
+  ]);
+});
+
 test('launch creation is never auth-retried and unknown outcomes warn against retrying', async (context) => {
   let tokenRequests = 0;
   const createRequests = new Map<string, number>();

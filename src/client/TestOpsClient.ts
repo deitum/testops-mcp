@@ -15,6 +15,8 @@ import {
   type Launch,
   type LaunchCreateRequest,
   type LaunchSearchParams,
+  type LaunchTestResult,
+  type LaunchTestResultSearchParams,
   type PageResult,
   type ProjectStatistics,
   type ProjectCustomField,
@@ -34,6 +36,7 @@ import {
   type TestCaseTrashSearchQuery,
   type TestCaseTrashSearchResult,
   type TestCaseTrashSummary,
+  type TestStatus,
   type TestStatusCount,
 } from './types';
 
@@ -111,6 +114,18 @@ interface ProjectCustomFieldValueApiItem {
   customField?: {
     id?: unknown;
   };
+}
+
+interface LaunchTestResultApiItem {
+  type?: unknown;
+  id?: unknown;
+  name?: unknown;
+  status?: unknown;
+  testCaseId?: unknown;
+  duration?: unknown;
+  flaky?: unknown;
+  hidden?: unknown;
+  manual?: unknown;
 }
 
 const TOKEN_PATH = '/api/uaa/oauth/token';
@@ -877,6 +892,27 @@ export class TestOpsClient {
     }));
   }
 
+  async getLaunchTestResults(
+    id: number,
+    params: LaunchTestResultSearchParams,
+  ): Promise<PageResult<LaunchTestResult>> {
+    await this.getLaunch(id);
+    const response = await this.client.get<ApiPageResponse<LaunchTestResultApiItem>>(
+      `/api/v2/launch/${id}/test-result/tree/folder`,
+      {
+        params: { page: params.page, size: params.size, deleted: params.deleted ?? false },
+        headers: this.getHeaders(),
+      },
+    );
+    const result = pageResult(response.data, 'launch test results');
+    return {
+      ...result,
+      items: result.items.map((item, index) =>
+        normalizeLaunchTestResult(item, `launch test result ${index}`),
+      ),
+    };
+  }
+
   async createLaunch(data: LaunchCreateRequest): Promise<Launch> {
     await this.ensureToken();
     let response;
@@ -1462,6 +1498,29 @@ function normalizeProjectCustomFieldValue(
   };
 }
 
+function normalizeLaunchTestResult(item: LaunchTestResultApiItem, label: string): LaunchTestResult {
+  const node = {
+    type: requiredString(item.type, `${label} type`),
+    id: requiredPositiveInteger(item.id, `${label} id`),
+    name: requiredString(item.name, `${label} name`),
+  };
+  // Only a LEAF is a test result; a folder node groups results and has no status of its own.
+  if (node.type !== 'LEAF') return node;
+
+  const testCaseId = optionalInteger(item.testCaseId, `${label} test case id`);
+  const duration = optionalInteger(item.duration, `${label} duration`);
+
+  return {
+    ...node,
+    status: requiredTestStatus(item.status, `${label} status`),
+    ...(testCaseId === undefined ? {} : { testCaseId }),
+    ...(duration === undefined ? {} : { duration }),
+    ...(typeof item.flaky === 'boolean' ? { flaky: item.flaky } : {}),
+    ...(typeof item.hidden === 'boolean' ? { hidden: item.hidden } : {}),
+    ...(typeof item.manual === 'boolean' ? { manual: item.manual } : {}),
+  };
+}
+
 function requiredInteger(value: unknown, label: string): number {
   if (typeof value !== 'number' || !Number.isInteger(value)) {
     throw new Error(`Invalid ${label}`);
@@ -1506,8 +1565,8 @@ function requiredString(value: unknown, label: string): string {
   return value;
 }
 
-function requiredTestStatus(value: unknown, label: string): TestStatusCount['status'] {
-  const statuses: TestStatusCount['status'][] = [
+function requiredTestStatus(value: unknown, label: string): TestStatus {
+  const statuses: TestStatus[] = [
     'failed',
     'broken',
     'passed',
@@ -1515,8 +1574,8 @@ function requiredTestStatus(value: unknown, label: string): TestStatusCount['sta
     'unknown',
     'in_progress',
   ];
-  if (!statuses.includes(value as TestStatusCount['status'])) {
+  if (!statuses.includes(value as TestStatus)) {
     throw new Error(`Invalid ${label}`);
   }
-  return value as TestStatusCount['status'];
+  return value as TestStatus;
 }

@@ -192,6 +192,8 @@ Launches:
 - `launch_create` — create a launch.
 - `launch_update` — rename a launch, given its exact current name.
 - `launch_statistic` — a launch's result counts by status.
+- `launch_test_results` — one page of a launch's test results, active or deleted, each with its own
+  status.
 
 Project:
 

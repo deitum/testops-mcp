@@ -17,6 +17,8 @@ export type {
   Launch,
   LaunchCreateRequest,
   LaunchSearchParams,
+  LaunchTestResult,
+  LaunchTestResultSearchParams,
   PageResult,
   ProjectCustomField,
   ProjectCustomFieldValue,
@@ -38,6 +40,7 @@ export type {
   TestCaseTrashSearchResult,
   TestCaseTrashSummary,
   TestCaseWorkflowStatus,
+  TestStatus,
   TestStatusCount,
 } from './client/types';
 export { loadConfig, type TestOpsConfig } from './config';
